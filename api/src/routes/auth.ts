@@ -33,11 +33,15 @@ router.post("/login", [
             const userJwt = jwt.sign({ 
                 id: existingUser.id,
                 email: existingUser.email
-            }, process.env.JWT_KEY!);
+            }, process.env.JWT_KEY!,{
+                expiresIn: "1d"
+            });
         
-            req.session = {
-                jwt : userJwt
-            };
+            res.cookie("token", userJwt, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                maxAge: 86400000,
+            });
         
             res.status(200).send(existingUser);
 

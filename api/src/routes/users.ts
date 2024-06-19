@@ -34,11 +34,15 @@ router.post("/register", [
             const userJwt = jwt.sign({
                 id: user.id,
                 email: user.email
-            }, process.env.JWT_KEY!);
+            }, process.env.JWT_KEY!,{
+                expiresIn: "1d"
+            }); 
 
-            req.session = {
-                jwt : userJwt
-            };
+            res.cookie("token", userJwt, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                maxAge: 86400000,
+            });
 
             return res.status(200).send({ message: "User registered OK" });
 
