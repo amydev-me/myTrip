@@ -1,22 +1,26 @@
-import express, { Request, Response} from 'express';
-import cors from 'cors';
-import "dotenv/config";
-import mongoose from 'mongoose';
+import moongose from 'mongoose';
+import { app } from './app';
 
-mongoose.connect(process.env.DATABASE_URL as string);
+const start = async() => {
+    if(!process.env.JWT_KEY) {
+        throw new Error("JWT_KEY must be defined");
+    }
 
-const app = express();
+    if(!process.env.MONGO_URI){
+        throw new Error('MONGO_URI must be defined.')
+    }
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+    try{
+        await moongose.connect(process.env.MONGO_URI);
+        console.log('Connected to MongoDB')
+    }
+    catch (err) {
+        console.log(err)
+    }
 
-app.get("/api/test", async (req:Request, res: Response) => {
-    res.json({
-        message: "Hi! This is first endpoint!"
+    app.listen(3002, () => {
+        console.log('Listening on port 3002!')
     });
-});
+}
 
-app.listen(3002, () => {
-    console.log("server is running on localhost:3002")
-});
+start();
