@@ -32,7 +32,7 @@ router.post("/register", [
             await user.save();
 
             const userJwt = jwt.sign({
-                id: user.id,
+                userId: user.id,
                 email: user.email
             }, process.env.JWT_KEY!,{
                 expiresIn: "1d"

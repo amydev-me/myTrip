@@ -3,6 +3,7 @@ import { check, validationResult } from "express-validator";
 import { User } from "../models/user";
 import { Password } from "../services/password";
 import jwt from "jsonwebtoken";
+import verifyToken from "../middleware/auth";
 
 const router = express.Router();
 
@@ -31,7 +32,7 @@ router.post("/login", [
             }
 
             const userJwt = jwt.sign({ 
-                id: existingUser.id,
+                userId: existingUser.id,
                 email: existingUser.email
             }, process.env.JWT_KEY!,{
                 expiresIn: "1d"
@@ -52,9 +53,15 @@ router.post("/login", [
 });
 
 router.post('/logout', (req: Request, res:Response) => {
-    req.session = null;
+    res.cookie("token", "", { 
+        expires: new Date(0)
+    });
 
-    res.send({})
-})
+    res.status(200).send({ message: "Logout successful!" })
+});
+
+router.get("/validate-token", verifyToken, (req: Request, res: Response) => {
+    res.status(200).send({ userId: req.userId })
+});
 
 export { router as authRoutes };
